@@ -5,6 +5,7 @@
  * 按键单独测试的时候是好的，但是加到一起后，就变得特别快（因为频率快
  * 不能用4MHz和12MHz的时钟————单片机的问题
  * __delay_cycles(20000000);//延时5S？
+ verson1.0
  * * * */
 #include <msp430f6638.h>
 
@@ -14,14 +15,14 @@
 
 //函数声明
 void initPWM(void);
-void initPara();
-float getVoltage();
 void pidAdjust(float in_voltage);
 void changePWM(int duty_value);
 void DispFloatat(unsigned char x,unsigned char y,float dat,unsigned char len1,unsigned char len2 );
 void my_key();
 void SMCLK_XT2_4Mhz(void);
 void suprotect(float vol);
+void initPara();
+float getVoltage();
 
 //变量声明
 double duty=0;//占空比
