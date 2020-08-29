@@ -7,10 +7,7 @@
  * __delay_cycles(20000000);//延时5S？
  * * * */
 #include <msp430f6638.h>
-#include "oled.h"
-#include "bmp.h"
-#include "key_button.h"
-#include "setclock.h"
+
 #include "pid_delta.h"
 #include "q_ADS1118.h"
 
