@@ -48,7 +48,7 @@ int main(void)
     {
         True_voltage=getVoltage();
 
-        if((True_voltage-pid.setPoint>=0.02)||(pid.setPoint-True_voltage>=0.02))
+        if((True_voltage-pid.setPoint>=0.0300)||(pid.setPoint-True_voltage>=0.0300))
             pidAdjust(True_voltage);
 
         my_key();
@@ -59,38 +59,45 @@ int main(void)
 }
 
 /******************************AD值读取函数**********************************/
-int j=0;
-float sum=0;
+int j=0,j_c=0;
+float sum=0,sum_c=0;
 float Voltage,Voltage_out=50;
+float Voltage2;
+float current;
 float getVoltage()//可
 {
     //测两个的时候为什么是反的
-        unsigned int Value,Value2;
+    unsigned int Value,Value2;
 
-        float Voltage2;
-        float current;
-        Value2 = Write_SIP(0xf38b);           //AD数值     Conversion Register
-        Voltage2=change_voltage(Value2,4.096);
-        current=Voltage2/0.6052;
-        DispFloatat(80,2,current,1,3);//显示电流值
-        suprotect(Voltage2);
-        usleep(20);
-        if(j>=100){
-            Voltage_out=sum/100;
-            DispFloatat(72,0,Voltage_out,2,3);//显示电压值
-            j=0;
-            sum=0;
-        }
-        else
-        {
-            Value = Write_SIP(0xe38b);           //AD数值     Conversion Register
-            Voltage=change_voltage(Value,4.096);
-            Voltage=Voltage*11.98;//-(1.519*current-0.1115)
-            sum+=Voltage;
-            j++;
-        }
-        return Voltage_out;
+    float Voltage2;
+    float current;
+    Value2 = Write_SIP(0xf38b);           //AD数值     Conversion Register
+    Voltage2=change_voltage(Value2,4.096);
+    current=Voltage2/0.6052;
+    DispFloatat(80,2,current,1,3);//显示电流值
+    suprotect(Voltage2);
+    usleep(20);
+    if(j>=100){
+        Voltage_out=sum/100;
+        DispFloatat(72,0,Voltage_out,2,3);//显示电压值
+        j=0;
+        sum=0;
+    }
+    else
+    {
+        Value = Write_SIP(0xe38b);           //AD数值     Conversion Register
+        Voltage=change_voltage(Value,4.096);
+        Voltage=Voltage*11.98;//-(1.519*current-0.1115)
+        sum+=Voltage;
+        j++;
+    }
+    return Voltage_out;
 
+//        Voltage2=change_voltage(Value2,4.096);
+//        current=Voltage2/0.6052;
+//        DispFloatat(80,2,current,1,3);//显示电流值
+//        suprotect(Voltage2);
+//        usleep(20);
 //        Value = Write_SIP(0xe38b);           //AD数值     Conversion Register
 //        Voltage=change_voltage(Value,4.096);
 //        Voltage=Voltage*11.98;//-(1.519*current-0.1115)
