@@ -30,8 +30,14 @@ float True_voltage=0;
 int key_value;
 double num=0;//按键所得数值
 
+int j=0,j_c=0;
+float sum=0,sum_c=0;
+float Voltage,Voltage_out=50;
+float Voltage2;
+float current;
+
 int main(void)
-{
+ {
     WDTCTL = WDTPW | WDTHOLD;   // stop watchdog timer
     SetClock_MCLK12MHZ_SMCLK24MHZ_ACLK32_768K();//12MHz
 //    UCSCTL5|=DIVS_2;//使用USC统一时钟系统进行预分频，将SMCLK进行4分频——————1M
@@ -48,38 +54,46 @@ int main(void)
     {
         True_voltage=getVoltage();
 
-        if((True_voltage-pid.setPoint>=0.040)||(pid.setPoint-True_voltage>=0.070))
+        if((True_voltage-pid.setPoint>=0.031)||(pid.setPoint-True_voltage>=0.041))
+        {
+//            if(current>=-0.0001&&current<=0.00001)
+//            {
+//                pid.setPoint = 36.020;
+//                DispFloatat(72,4,36.0,2,3);//显示
+//            }
+//            else
+//            {
+                pid.setPoint = 36;
+                DispFloatat(72,4,pid.setPoint,2,3);//显示
+//            }
             pidAdjust(True_voltage);
+        }
 //        else
 //        {
-//            if((True_voltage-pid.setPoint>=0.0100)||(pid.setPoint-True_voltage>=0.0100))
-//            {
+////            if((True_voltage-pid.setPoint>=0.0100)||(pid.setPoint-True_voltage>=0.0100))
+////            {
 //                if(True_voltage-pid.setPoint>=0.00100)
 //                {
-//                    duty = duty - 1;                 //修正占空比
+//                    duty = duty - 0.1;                 //修正占空比
 //                       changePWM(duty);                      //生效控制
 //                }
 //                if(pid.setPoint-True_voltage>=0.00100)
 //                {
-//                    duty = duty + 1;                 //修正占空比
+//                    duty = duty + 0.1;                 //修正占空比
 //                       changePWM(duty);                      //生效控制
 //                }
-//            }
+////            }
 //        }
 
         my_key();
-        DispFloatat(72,4,pid.setPoint,2,3);//显示
+//        DispFloatat(72,4,pid.setPoint,2,3);//显示
         DispFloatat(16,6,pid.Proportion,2,2);//显示
         DispFloatat(72,6,pid.Integral,2,3);//显示
     }
 }
 
 /******************************AD值读取函数**********************************/
-int j=0,j_c=0;
-float sum=0,sum_c=0;
-float Voltage,Voltage_out=50;
-float Voltage2;
-float current;
+
 float getVoltage()//可
 {
     //测两个的时候为什么是反的
@@ -92,20 +106,41 @@ float getVoltage()//可
     if(current<0.12000)
         current=0;
     DispFloatat(80,2,current,1,3);//显示电流值
-    usleep(20);
-    if(j>=100){
-        Voltage_out=sum/100;
-        DispFloatat(72,0,Voltage_out,2,3);//显示电压值
-        j=0;
-        sum=0;
+//    usleep(10);
+    if(current>=-0.0001&&current<=0.00001)
+    {
+
+        if(j>=200){
+            Voltage_out=sum/200;
+            DispFloatat(72,0,Voltage_out,2,3);//显示电压值
+            j=0;
+            sum=0;
+        }
+        else
+        {
+            Value = Write_SIP(0xe38b);           //AD数值     Conversion Register
+            Voltage=change_voltage(Value,4.096);
+            Voltage=Voltage*11.98-(0.1592*current-0.4858);//
+            sum+=Voltage;
+            j++;
+        }
     }
     else
     {
-        Value = Write_SIP(0xe38b);           //AD数值     Conversion Register
-        Voltage=change_voltage(Value,4.096);
-        Voltage=Voltage*11.98-(0.1592*current-0.4858);//
-        sum+=Voltage;
-        j++;
+        if(j>=100){
+            Voltage_out=sum/100;
+            DispFloatat(72,0,Voltage_out,2,3);//显示电压值
+            j=0;
+            sum=0;
+        }
+        else
+        {
+            Value = Write_SIP(0xe38b);           //AD数值     Conversion Register
+            Voltage=change_voltage(Value,4.096);
+            Voltage=Voltage*11.98-(0.1592*current-0.4858);//
+            sum+=Voltage;
+            j++;
+        }
     }
     return Voltage_out;
 
@@ -189,7 +224,7 @@ void initPara()
 {
   duty = 200;    //测试值？不确定
   pid.setPoint = 36;   ////设定值，不确定
-  adjust_pid(&pid, 1.000, 0.100, 0);//调整PID系数
+  adjust_pid(&pid, 0.75, 0.0200, 0);//调整PID系数
   adjust_pid_limit(&pid, -10, 10);//设定PID误差增量的限制范围
   ADS1118_GPIO_Init();  //配置管脚（模拟SPI，加上Vcc、GND需要6根线，除去这俩需要4根线，故需要管脚配置）
 
