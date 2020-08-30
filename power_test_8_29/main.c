@@ -48,7 +48,7 @@ int main(void)
     {
         True_voltage=getVoltage();
 
-        if((True_voltage-pid.setPoint>=0.080)||(pid.setPoint-True_voltage>=0.080))
+        if((True_voltage-pid.setPoint>=0.040)||(pid.setPoint-True_voltage>=0.070))
             pidAdjust(True_voltage);
 //        else
 //        {
@@ -84,14 +84,14 @@ float getVoltage()//可
 {
     //测两个的时候为什么是反的
     unsigned int Value,Value2;
-
-    float Voltage2;
-    float current;
     Value2 = Write_SIP(0xf38b);           //AD数值     Conversion Register
     Voltage2=change_voltage(Value2,4.096);
     current=Voltage2/0.6052;
-    DispFloatat(80,2,current,1,3);//显示电流值
+
     suprotect(Voltage2);
+    if(current<0.12000)
+        current=0;
+    DispFloatat(80,2,current,1,3);//显示电流值
     usleep(20);
     if(j>=100){
         Voltage_out=sum/100;
