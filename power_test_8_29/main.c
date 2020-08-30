@@ -48,8 +48,24 @@ int main(void)
     {
         True_voltage=getVoltage();
 
-        if((True_voltage-pid.setPoint>=0.0300)||(pid.setPoint-True_voltage>=0.0300))
+        if((True_voltage-pid.setPoint>=0.080)||(pid.setPoint-True_voltage>=0.080))
             pidAdjust(True_voltage);
+//        else
+//        {
+//            if((True_voltage-pid.setPoint>=0.0100)||(pid.setPoint-True_voltage>=0.0100))
+//            {
+//                if(True_voltage-pid.setPoint>=0.00100)
+//                {
+//                    duty = duty - 1;                 //修正占空比
+//                       changePWM(duty);                      //生效控制
+//                }
+//                if(pid.setPoint-True_voltage>=0.00100)
+//                {
+//                    duty = duty + 1;                 //修正占空比
+//                       changePWM(duty);                      //生效控制
+//                }
+//            }
+//        }
 
         my_key();
         DispFloatat(72,4,pid.setPoint,2,3);//显示
@@ -87,7 +103,7 @@ float getVoltage()//可
     {
         Value = Write_SIP(0xe38b);           //AD数值     Conversion Register
         Voltage=change_voltage(Value,4.096);
-        Voltage=Voltage*11.98;//-(1.519*current-0.1115)
+        Voltage=Voltage*11.98-(0.1592*current-0.4858);//
         sum+=Voltage;
         j++;
     }
@@ -127,9 +143,9 @@ void suprotect(float vol)
 void pidAdjust(float in_voltage)
 {
   dealtV = PidDeltaCal(&pid,in_voltage);  //返回误差增量
-  if((duty + dealtV) > 312)//65%
+  if((duty + dealtV) > 290)//65%
   {
-      duty = 312;
+      duty = 290;
     changePWM(duty);                      //生效控制
   }
   else if((duty + dealtV) < 0)
