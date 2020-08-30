@@ -48,7 +48,7 @@ int main(void)
     {
         True_voltage=getVoltage();
 
-        if((True_voltage-pid.setPoint>=0.011)||(pid.setPoint-True_voltage>=0.011))
+        if((True_voltage-pid.setPoint>=0.02)||(pid.setPoint-True_voltage>=0.02))
             pidAdjust(True_voltage);
 
         my_key();
@@ -61,7 +61,7 @@ int main(void)
 /******************************AD值读取函数**********************************/
 int j=0;
 float sum=0;
-float Voltage,Voltage_out=45;
+float Voltage,Voltage_out=50;
 float getVoltage()//可
 {
     //测两个的时候为什么是反的
@@ -75,8 +75,8 @@ float getVoltage()//可
         DispFloatat(80,2,current,1,3);//显示电流值
         suprotect(Voltage2);
         usleep(20);
-        if(j>=10){
-            Voltage_out=sum/10;
+        if(j>=100){
+            Voltage_out=sum/100;
             DispFloatat(72,0,Voltage_out,2,3);//显示电压值
             j=0;
             sum=0;
@@ -166,7 +166,7 @@ void initPara()
 {
   duty = 200;    //测试值？不确定
   pid.setPoint = 36;   ////设定值，不确定
-  adjust_pid(&pid, 0.69, 0.029, 0);//调整PID系数
+  adjust_pid(&pid, 1.000, 0.100, 0);//调整PID系数
   adjust_pid_limit(&pid, -10, 10);//设定PID误差增量的限制范围
   ADS1118_GPIO_Init();  //配置管脚（模拟SPI，加上Vcc、GND需要6根线，除去这俩需要4根线，故需要管脚配置）
 
