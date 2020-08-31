@@ -107,11 +107,11 @@ float getVoltage()//可
         current=0;
     DispFloatat(80,2,current,1,3);//显示电流值
 //    usleep(10);
-    if(current<=0.007)
+    if(current>=-0.0001&&current<=0.00001)
     {
 
         if(j>=200){
-            Voltage_out=sum/200-0.18;
+            Voltage_out=sum/200;
             DispFloatat(72,0,Voltage_out,2,3);//显示电压值
             j=0;
             sum=0;
